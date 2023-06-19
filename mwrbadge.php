@@ -284,7 +284,7 @@ class mwrbadge extends Module
         }
     }
 
-    public function isBestOnlinePrice($id_product)
+    public function isBestOnlinePrice($id_product, $price = false)
     {
 
         $id_lang = $this->context->language->id;
@@ -293,8 +293,11 @@ class mwrbadge extends Module
             return false;
         }
 
-        $product = new Product($id_product, false, $id_lang);
-        if ($product->getPrice() < $amount) {
+        if (!$price) {
+            $product = new Product($id_product, false, $id_lang);
+            $price = $product->getPrice();
+        }
+        if ($price < $amount) {
             return true;
         }
         return false;
@@ -303,7 +306,7 @@ class mwrbadge extends Module
     public function hookActionProductFlagsModifier($params)
     {
 
-        if ($this->isBestOnlinePrice($params['product']['id_product'])) {
+        if ($this->isBestOnlinePrice($params['product']['id_product'], $params['product']['price_amount'])) {
             $params['flags']['bestseller'] = array(
                 'type' => 'bestseller',
                 'label' => $this->l('Best Online Price')
